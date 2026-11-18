@@ -1,0 +1,18 @@
+{
+  "name": "backend-expediente-practicas",
+  "version": "1.0.0",
+  "description": "Práctica 4: API REST del recurso «pacientes» (datos de mentira, guardados en memoria)",
+  "main": "src/index.js",
+  "private": true,
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "engines": {
+    "node": ">=18.11"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.7",
+    "express": "^5.3.0"
+  }
+}

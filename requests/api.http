@@ -1,0 +1,221 @@
+@baseUrl = http://localhost:3000
+
+# =============================================================================
+# Pruebas de la API de pacientes (práctica 4) — 27 peticiones
+#
+# Cómo usar este archivo:
+#   1. En VS Code instala la extensión "REST Client" (humao.rest-client).
+#   2. Enciende el servidor:  cd backend  →  npm run dev
+#   3. Haz clic en "Send Request" (aparece encima de cada petición) y compara
+#      el código de estado de la respuesta con el que dice "Esperado".
+#   4. Las peticiones 13, 22 y 23 van en orden: la 13 crea un paciente y las
+#      siguientes usan su id. Si reinicias el servidor, vuelve a empezar por la 13.
+# =============================================================================
+
+
+### 1. Raíz — presentación de la API
+# Esperado: 200
+GET {{baseUrl}}/
+
+
+### 2. Ping — comprobar que el servidor está vivo
+# Esperado: 200  →  { "mensaje": "pong" }
+GET {{baseUrl}}/ping
+
+
+### 3. Lista completa de pacientes
+# Esperado: 200  →  6 pacientes al arrancar
+GET {{baseUrl}}/api/pacientes
+
+
+### 4. Filtro por estado
+# Esperado: 200  →  solo los hospitalizados
+GET {{baseUrl}}/api/pacientes?estado=hospitalizado
+
+
+### 5. Dos filtros combinados (sexo y estado)
+# Esperado: 200  →  solo las mujeres que ya tienen alta
+GET {{baseUrl}}/api/pacientes?sexo=F&estado=alta
+
+
+### 6. Búsqueda por nombre (no importan acentos ni mayúsculas)
+# Esperado: 200  →  encuentra a "Ana Sofía Ramírez Torres"
+GET {{baseUrl}}/api/pacientes?buscar=RAMIREZ
+
+
+### 7. ERROR — filtro con un valor que no existe
+# Esperado: 400
+GET {{baseUrl}}/api/pacientes?estado=volando
+
+
+### 8. ERROR — filtro "buscar" vacío
+# Esperado: 400
+GET {{baseUrl}}/api/pacientes?buscar=
+
+
+### 9. Resumen (total, por estado y por sexo)
+# Esperado: 200
+GET {{baseUrl}}/api/pacientes/resumen
+
+
+### 10. Un paciente por su id
+# Esperado: 200
+GET {{baseUrl}}/api/pacientes/1
+
+
+### 11. ERROR — id que no es un número
+# Esperado: 400
+GET {{baseUrl}}/api/pacientes/abc
+
+
+### 12. ERROR — id que no existe
+# Esperado: 404
+GET {{baseUrl}}/api/pacientes/999
+
+
+### 13. Alta de un paciente (todos los campos bien)
+# Esperado: 201  →  trae la cabecera "Location: /api/pacientes/7"
+# @name crearPaciente
+POST {{baseUrl}}/api/pacientes
+Content-Type: application/json
+
+{
+  "nombre": "Paciente de Prueba Uno",
+  "fecha_nacimiento": "1990-05-14",
+  "sexo": "F",
+  "telefono": "2221234567",
+  "estado": "ambulatorio"
+}
+
+
+### 14. ERROR — falta el nombre
+# Esperado: 400
+POST {{baseUrl}}/api/pacientes
+Content-Type: application/json
+
+{
+  "fecha_nacimiento": "1990-05-14",
+  "sexo": "F",
+  "telefono": "2221234567",
+  "estado": "ambulatorio"
+}
+
+
+### 15. ERROR — fecha que no existe (31 de febrero)
+# Esperado: 400
+POST {{baseUrl}}/api/pacientes
+Content-Type: application/json
+
+{
+  "nombre": "Paciente de Prueba Dos",
+  "fecha_nacimiento": "2026-02-31",
+  "sexo": "M",
+  "telefono": "2221234567",
+  "estado": "alta"
+}
+
+
+### 16. ERROR — fecha en formato que no es AAAA-MM-DD
+# Esperado: 400
+POST {{baseUrl}}/api/pacientes
+Content-Type: application/json
+
+{
+  "nombre": "Paciente de Prueba Tres",
+  "fecha_nacimiento": "14/05/1990",
+  "sexo": "M",
+  "telefono": "2221234567",
+  "estado": "alta"
+}
+
+
+### 17. ERROR — sexo con un valor no permitido
+# Esperado: 400
+POST {{baseUrl}}/api/pacientes
+Content-Type: application/json
+
+{
+  "nombre": "Paciente de Prueba Cuatro",
+  "fecha_nacimiento": "1990-05-14",
+  "sexo": "X",
+  "telefono": "2221234567",
+  "estado": "alta"
+}
+
+
+### 18. ERROR — teléfono con letras y de menos de 10 dígitos
+# Esperado: 400
+POST {{baseUrl}}/api/pacientes
+Content-Type: application/json
+
+{
+  "nombre": "Paciente de Prueba Cinco",
+  "fecha_nacimiento": "1990-05-14",
+  "sexo": "F",
+  "telefono": "22212abc",
+  "estado": "alta"
+}
+
+
+### 19. ERROR — estado con un valor no permitido
+# Esperado: 400
+POST {{baseUrl}}/api/pacientes
+Content-Type: application/json
+
+{
+  "nombre": "Paciente de Prueba Seis",
+  "fecha_nacimiento": "1990-05-14",
+  "sexo": "F",
+  "telefono": "2221234567",
+  "estado": "volando"
+}
+
+
+### 20. ERROR — JSON roto (falta cerrar la llave y las comillas)
+# Esperado: 400  →  la respuesta NO debe ser un 500
+POST {{baseUrl}}/api/pacientes
+Content-Type: application/json
+
+{
+  "nombre": "Paciente roto",
+  "sexo": "F
+
+
+### 21. ERROR — POST sin cuerpo
+# Esperado: 400
+POST {{baseUrl}}/api/pacientes
+
+
+### 22. Baja del paciente que se creó en la petición 13
+# Esperado: 200  →  devuelve el paciente eliminado
+DELETE {{baseUrl}}/api/pacientes/{{crearPaciente.response.body.$.id}}
+
+
+### 23. ERROR — borrar otra vez al mismo paciente (ya no existe)
+# Esperado: 404
+DELETE {{baseUrl}}/api/pacientes/{{crearPaciente.response.body.$.id}}
+
+
+### 24. ERROR — DELETE con un id que no es un número
+# Esperado: 400
+DELETE {{baseUrl}}/api/pacientes/abc
+
+
+### 25. ERROR — ruta que falla a propósito
+# Esperado: 500  →  { "error": "Error interno del servidor" } sin detalles internos
+GET {{baseUrl}}/falla
+
+
+### 26. ERROR — ruta que no existe (404 general)
+# Esperado: 404
+GET {{baseUrl}}/api/medicos
+
+
+### 27. ERROR — método que todavía no existe (404 general)
+# Esperado: 404
+PUT {{baseUrl}}/api/pacientes/1
+Content-Type: application/json
+
+{
+  "nombre": "No existe PUT todavía"
+}

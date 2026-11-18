@@ -1,0 +1,13 @@
+# Dependencias
+node_modules/
+
+# Secretos y configuración local: NUNCA subir
+.env
+*.env
+!.env.example
+
+# Basura del sistema / editor
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
