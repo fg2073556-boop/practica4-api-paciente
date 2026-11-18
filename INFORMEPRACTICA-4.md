@@ -35,9 +35,13 @@ Cuando todo está bien, la terminal muestra `Servidor listo en http://localhost:
 
 ![Captura 01 — GET / en el navegador, con el servidor corriendo en el puerto 3000](capturas/01-servidor-en-navegador.png)
 
+Esta es la terminal de VS Code, dentro de la carpeta `backend`, después de correr `npm run dev` (que ejecuta `node --watch src/index.js`). Muestra el mensaje `Servidor listo en http://localhost:3000`, y también se ve que `--watch` reinició el servidor solo al detectar un cambio en `config.js`:
+
+![Captura 02 — Terminal de VS Code con npm run dev y el servidor listo](capturas/02-terminal-npm-run-dev.png)
+
 El repositorio es público y tiene las carpetas `backend` y `requests`, el `README.md`, el `.gitignore` y este informe; no incluye `.env` ni `node_modules`:
 
-![Captura 02 — Repositorio público en GitHub](capturas/02-repositorio-publico.png)
+![Captura 03 — Repositorio público en GitHub](capturas/03-repositorio-publico.png)
 
 ## 3. Estructura por capas
 
